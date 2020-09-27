@@ -1,0 +1,27 @@
+{
+    "name": "sudhaus7/guard7-core",
+    "description": "Guard7 core",
+    "type": "library",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Frank Berger",
+            "email": "fberger@sudhaus7.de"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^8",
+        "phpstan/phpstan": "^0.12.45"
+    },
+    "autoload": {
+        "psr-4": {
+            "SUDHAUS7\\Guard7Core\\": "src/Classes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SUDHAUS7\\Guard7Core\\Tests\\": "Tests"
+        }
+    }
+}
