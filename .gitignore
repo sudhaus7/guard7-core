@@ -75,3 +75,4 @@ fabric.properties
 /vendor
 .Build
 composer.lock
+.phpunit.result.cache
