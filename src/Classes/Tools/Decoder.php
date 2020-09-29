@@ -36,7 +36,7 @@ class Decoder
     public static function decode(ConfigurationAdapterInterface $configuration, CryptExtensionInterface $key, $data, string $password = null)
     {
         $serviceClass = '\\SUDHAUS7\\Guard7Core\\'.ucfirst(strtolower($configuration->getCryptLibrary())).'\\Service';
-        if ( class_exists($serviceClass) && in_array(CryptExtensionService::class, class_implements($serviceClass))) {
+        if (class_exists($serviceClass) && in_array(CryptExtensionService::class, class_implements($serviceClass))) {
             return $serviceClass::decode($data, $key, $password);
         }
         return null;

@@ -71,10 +71,10 @@ class Encoder
     public function setContent($content): void
     {
         if (is_array($content)) {
-            $content = 'json:'. json_encode($content);
+            $content = 'json:'.json_encode($content);
         }
-        if ( is_object($content)) {
-            $content = 'serialized:'. serialize($content);
+        if (is_object($content)) {
+            $content = 'serialized:'.serialize($content);
         }
         $this->content = $content;
     }
@@ -86,7 +86,7 @@ class Encoder
     public function run(): ?string
     {
         $serviceClass = '\\SUDHAUS7\\Guard7Core\\'.ucfirst(strtolower($this->configurationAdapter->getCryptLibrary())).'\\Service';
-        if ( class_exists($serviceClass) && in_array(CryptExtensionService::class, class_implements($serviceClass))) {
+        if (class_exists($serviceClass) && in_array(CryptExtensionService::class, class_implements($serviceClass))) {
             return $serviceClass::encode($this->method, $this->pubkeys, $this->content);
         }
         return null;
@@ -144,7 +144,7 @@ class Encoder
 
         //$valid = ['RC4','AES128','AES256','DES'];
         $valid = openssl_get_cipher_methods(true);
-        if ( in_array($method, $valid, true)) {
+        if (in_array($method, $valid, true)) {
             $this->method = $method;
         }
     }

@@ -49,7 +49,7 @@ final class Key implements CryptExtensionInterface
         if ($publickey === null) {
             try {
                 $this->unlock($password);
-            } catch ( Exception $e) {
+            } catch (Exception $e) {
                 // at this point it is ok if we cannot be unlock yet
             }
         }
