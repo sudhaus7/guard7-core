@@ -2,7 +2,7 @@ name: Tests
 on: [push]
 jobs:
   test:
-    name: Test on ${{ matrix.php-binary }}
+    name: Test ${{ matrix.php-binary }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
