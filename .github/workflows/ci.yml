@@ -1,0 +1,25 @@
+name: Tests
+on: [push]
+jobs:
+  test:
+    name: Test on ${{ matrix.php-binary }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-binary:
+          - php7.2
+          - php7.3
+          - php7.4
+    steps:
+      - uses: actions/checkout@v1
+      - name: Check PHP Version
+        run: ${{ matrix.php-binary }} -v
+      - name: Check Composer
+        run: ${{ matrix.php-binary }} $(which composer) -V
+      - name: Composer install
+        run: ${{ matrix.php-binary }} $(which composer) install
+      - name: PHPUnit
+        run: ${{ matrix.php-binary }} vendor/bin/phpunit
+      - name: PHPStan
+        run: ${{ matrix.php-binary }} vendor/bin/phpstan analyse --level max src/
+
