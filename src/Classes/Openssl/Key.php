@@ -3,11 +3,15 @@
 
 namespace SUDHAUS7\Guard7Core\Openssl;
 
+use Exception;
 use SUDHAUS7\Guard7Core\Exceptions\KeyNotReadableException;
 use SUDHAUS7\Guard7Core\Exceptions\KeyNotUnlockedYetException;
 use SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException;
 use SUDHAUS7\Guard7Core\Interfaces\CryptExtensionInterface;
 use SUDHAUS7\Guard7Core\Service\ChecksumService;
+use function openssl_free_key;
+use function openssl_pkey_export;
+use function openssl_pkey_new;
 
 final class Key implements CryptExtensionInterface
 {
@@ -35,7 +39,7 @@ final class Key implements CryptExtensionInterface
         "private_key_bits" => 4096,
         "private_key_type" => OPENSSL_KEYTYPE_RSA,
     ];
-    
+
     /**
      * @inheritDoc
      */
@@ -45,7 +49,7 @@ final class Key implements CryptExtensionInterface
         if ($publickey === null) {
             try {
                 $this->unlock($password);
-            } catch (\Exception $e) {
+            } catch ( Exception $e) {
                 // at this point it is ok if we cannot be unlock yet
             }
         }
@@ -56,9 +60,8 @@ final class Key implements CryptExtensionInterface
      */
     public function __destruct()
     {
-        
         if ($this->resource) {
-            \openssl_free_key($this->resource);
+            openssl_free_key($this->resource);
         }
     }
 
@@ -68,16 +71,16 @@ final class Key implements CryptExtensionInterface
     public static function createNewKey(string $password = null): CryptExtensionInterface
     {
         /** @var resource $res */
-        $res = \openssl_pkey_new(self::$DEFAULTS);
+        $res = openssl_pkey_new(self::$DEFAULTS);
 
-        \openssl_pkey_export($res, $privatekey);
+        openssl_pkey_export($res, $privatekey);
         /** @var array $details */
         $details = openssl_pkey_get_details($res);
         $publickey = $details["key"];
         if ($password) {
-            \openssl_pkey_export($res, $privatekey, $password);
+            openssl_pkey_export($res, $privatekey, $password);
         }
-        \openssl_free_key($res);
+        openssl_free_key($res);
 
         return new self($privatekey, $password, $publickey);
     }
@@ -124,7 +127,7 @@ final class Key implements CryptExtensionInterface
     public function lock(string $password): bool
     {
         if ($this->resource) {
-            \openssl_pkey_export($this->resource, $privatekey, $password);
+            openssl_pkey_export($this->resource, $privatekey, $password);
             $this->private = $privatekey;
         }
         return false;
@@ -172,7 +175,7 @@ final class Key implements CryptExtensionInterface
         if ($this->resource) {
             openssl_pkey_export($this->resource, $out);
         } else {
-            throw new KeyNotUnlockedYetException('the key has not been unlocked',1601211320);
+            throw new KeyNotUnlockedYetException('the key has not been unlocked', 1601211320);
         }
         return new Key($out);
     }

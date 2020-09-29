@@ -14,6 +14,10 @@ use SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException;
 use SUDHAUS7\Guard7Core\Interfaces\ConfigurationAdapterInterface;
 use SUDHAUS7\Guard7Core\Interfaces\CryptExtensionInterface;
 use SUDHAUS7\Guard7Core\Interfaces\CryptExtensionService;
+use function class_exists;
+use function class_implements;
+use function in_array;
+use function strtolower;
 
 /**
  * Class Decoder
@@ -29,10 +33,10 @@ class Decoder
      * @throws MissingKeyException
      * @throws UnlockException
      */
-    public static function decode(ConfigurationAdapterInterface $configuration, CryptExtensionInterface $key,  $data, string $password = null)
+    public static function decode(ConfigurationAdapterInterface $configuration, CryptExtensionInterface $key, $data, string $password = null)
     {
-        $serviceClass = '\\SUDHAUS7\\Guard7Core\\'.ucfirst(\strtolower($configuration->getCryptLibrary())).'\\Service';
-        if (\class_exists($serviceClass) && \in_array(CryptExtensionService::class, \class_implements($serviceClass))) {
+        $serviceClass = '\\SUDHAUS7\\Guard7Core\\'.ucfirst(strtolower($configuration->getCryptLibrary())).'\\Service';
+        if ( class_exists($serviceClass) && in_array(CryptExtensionService::class, class_implements($serviceClass))) {
             return $serviceClass::decode($data, $key, $password);
         }
         return null;

@@ -2,6 +2,7 @@
 
 namespace SUDHAUS7\Guard7Core\Tests\Unit;
 
+use InvalidArgumentException;
 use SUDHAUS7\Guard7Core\Factory\KeyFactory;
 use PHPUnit\Framework\TestCase;
 use SUDHAUS7\Guard7Core\Interfaces\CryptExtensionInterface;
@@ -17,7 +18,6 @@ use SUDHAUS7\Guard7Core\Tests\Mockups\Dummy;
  */
 class KeyFactoryTest extends TestCase
 {
-    
     protected $key='-----BEGIN PRIVATE KEY-----
 MIIJRQIBADANBgkqhkiG9w0BAQEFAASCCS8wggkrAgEAAoICAQDUfLTHPqWR+ZOe
 uNCjbBPXBh3Qx05J5UVpzZG3teP/EPf5tB6WetdcfaCh8C2DV59pr1wlRmtklYOn
@@ -70,31 +70,28 @@ q40seRyWqvsB9Fw2Rx2+6q4eHXxy/CO5o5vrj8Q+7vs9qB7yXiiqsX/2tD2Idg7M
 Hlyo03CAPvYBySW4RHUQB3moayIqNojP9bnAdmj+iIviCPZYllJ+i00rzb5FhScK
 tq7/ZVTmF+TsUFItApDXsg76kZ66oPJufw==
 -----END PRIVATE KEY-----';
-    
-    public function testNewKey():void
+
+    public function testNewKey(): void
     {
         $key = KeyFactory::newKey(Key::class);
         $this->assertInstanceOf(CryptExtensionInterface::class, $key);
     }
-    
-    public function testWrongClass():void
+
+    public function testWrongClass(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         KeyFactory::newKey(Dummy::class);
     }
-    
-    public function testReadFromFileOrData():void
+
+    public function testReadFromFileOrData(): void
     {
-        
         $test = KeyFactory::readFromString(Key::class, $this->key);
         $this->assertInstanceOf(CryptExtensionInterface::class, $test);
     }
-    public function testReadFromFileOrDataWrongClass():void
+    public function testReadFromFileOrDataWrongClass(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-    
+        $this->expectException(InvalidArgumentException::class);
+
         $test = KeyFactory::readFromString(Dummy::class, $this->key);
     }
-    
-    
 }

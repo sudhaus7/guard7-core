@@ -12,6 +12,13 @@ use SUDHAUS7\Guard7Core\Exceptions\SealException;
 use SUDHAUS7\Guard7Core\Interfaces\ConfigurationAdapterInterface;
 use SUDHAUS7\Guard7Core\Interfaces\CryptExtensionService;
 use SUDHAUS7\Guard7Core\Service\ChecksumService;
+use function class_exists;
+use function class_implements;
+use function in_array;
+use function is_object;
+use function json_encode;
+use function serialize;
+use function strtolower;
 
 class Encoder
 {
@@ -57,17 +64,17 @@ class Encoder
         $this->setPubkeys($pubKeys);
         $this->setMethod($method);
     }
-    
+
     /**
      * @param mixed $content
      */
-    public function setContent($content) : void
+    public function setContent($content): void
     {
         if (is_array($content)) {
-            $content = 'json:'.\json_encode($content);
+            $content = 'json:'. json_encode($content);
         }
-        if (\is_object($content)) {
-            $content = 'serialized:'.\serialize($content);
+        if ( is_object($content)) {
+            $content = 'serialized:'. serialize($content);
         }
         $this->content = $content;
     }
@@ -78,8 +85,8 @@ class Encoder
      */
     public function run(): ?string
     {
-        $serviceClass = '\\SUDHAUS7\\Guard7Core\\'.ucfirst(\strtolower($this->configurationAdapter->getCryptLibrary())).'\\Service';
-        if (\class_exists($serviceClass) && \in_array(CryptExtensionService::class, \class_implements($serviceClass))) {
+        $serviceClass = '\\SUDHAUS7\\Guard7Core\\'.ucfirst(strtolower($this->configurationAdapter->getCryptLibrary())).'\\Service';
+        if ( class_exists($serviceClass) && in_array(CryptExtensionService::class, class_implements($serviceClass))) {
             return $serviceClass::encode($this->method, $this->pubkeys, $this->content);
         }
         return null;
@@ -88,7 +95,7 @@ class Encoder
     /**
      * @param string $key
      */
-    public function addPubkey(string $key) : void
+    public function addPubkey(string $key): void
     {
         $checksum = ChecksumService::calculate($key);
         $this->pubkeys[$checksum] = $key;
@@ -113,7 +120,7 @@ class Encoder
     /**
      * @param array $pubkeys
      */
-    public function setPubkeys(array $pubkeys) : void
+    public function setPubkeys(array $pubkeys): void
     {
         foreach ($pubkeys as $key) {
             $checksum = ChecksumService::calculate($key);
@@ -132,12 +139,12 @@ class Encoder
     /**
      * @param string $method
      */
-    public function setMethod(string $method) : void
+    public function setMethod(string $method): void
     {
 
         //$valid = ['RC4','AES128','AES256','DES'];
         $valid = openssl_get_cipher_methods(true);
-        if (\in_array($method, $valid, true)) {
+        if ( in_array($method, $valid, true)) {
             $this->method = $method;
         }
     }

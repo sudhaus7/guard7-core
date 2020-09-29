@@ -3,6 +3,7 @@
 
 namespace SUDHAUS7\Guard7Core\Openssl;
 
+use RuntimeException;
 use SUDHAUS7\Guard7Core\Exceptions\KeyNotReadableException;
 use SUDHAUS7\Guard7Core\Exceptions\MissingKeyException;
 use SUDHAUS7\Guard7Core\Exceptions\SealException;
@@ -10,6 +11,13 @@ use SUDHAUS7\Guard7Core\Exceptions\UnlockException;
 use SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException;
 use SUDHAUS7\Guard7Core\Interfaces\CryptExtensionInterface;
 use SUDHAUS7\Guard7Core\Interfaces\CryptExtensionService;
+use function json_decode;
+use function openssl_free_key;
+use function openssl_get_publickey;
+use function openssl_open;
+use function openssl_random_pseudo_bytes;
+use function openssl_seal;
+use function unserialize;
 
 class Service implements CryptExtensionService
 {
@@ -20,15 +28,15 @@ class Service implements CryptExtensionService
     {
         $signatures = array_keys($publicKeys);
         $pubkeys = array_values($publicKeys);
-        $iv = \openssl_random_pseudo_bytes(32, $isSourceStrong);
+        $iv = openssl_random_pseudo_bytes(32, $isSourceStrong);
         if (false === $isSourceStrong || false === $iv) {
-            throw new \RuntimeException('IV generation failed');
+            throw new RuntimeException('IV generation failed');
         }
         foreach ($pubkeys as $idx => $key) {
-            $pubkeys[$idx] = \openssl_get_publickey($key);
+            $pubkeys[$idx] = openssl_get_publickey($key);
         }
-    
-        $ret = \openssl_seal($payload, $sealed, $ekeys, $pubkeys, $method, $iv);
+
+        $ret = openssl_seal($payload, $sealed, $ekeys, $pubkeys, $method, $iv);
 
         if (!($ret > 0)) {
             throw new SealException("Seal failed");
@@ -36,7 +44,7 @@ class Service implements CryptExtensionService
 
         /** @var resource $key */
         foreach ($pubkeys as $key) {
-            \openssl_free_key($key);
+            openssl_free_key($key);
         }
         $envelope = [];
         foreach ($ekeys as $k => $ekey) {
@@ -63,17 +71,17 @@ class Service implements CryptExtensionService
         $envkeys = json_decode(base64_decode($b64_envkeys), true);
         $envkey = base64_decode($envkeys[$keyhash]);
 
-        if (!\openssl_open(base64_decode($b64_secret), $open, $envkey, $privkey, $method, $iv)) {
-            \openssl_free_key($privkey);
+        if (!openssl_open(base64_decode($b64_secret), $open, $envkey, $privkey, $method, $iv)) {
+            openssl_free_key($privkey);
             throw new UnlockException('Data not unlockable');
         }
-        \openssl_free_key($privkey);
+        openssl_free_key($privkey);
 
         if (strpos($open, 'json')===0) {
-            $open = \json_decode(substr($open, 5), true);
+            $open = json_decode(substr($open, 5), true);
         }
         if (strpos($open, 'serialize')===0) {
-            $open = \unserialize(substr($open, 10), []);
+            $open = unserialize(substr($open, 10), []);
         }
         return $open;
     }

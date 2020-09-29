@@ -2,77 +2,77 @@
 
 namespace SUDHAUS7\Guard7Core\Tests\Unit;
 
+use stdClass;
 use SUDHAUS7\Guard7Core\Openssl\Key;
 use SUDHAUS7\Guard7Core\Tests\Mockups\ConfigAdapter;
 use SUDHAUS7\Guard7Core\Tools\Encoder;
 use PHPUnit\Framework\TestCase;
+use function is_array;
 
 /**
  * @covers \SUDHAUS7\Guard7Core\Tools\Encoder
  */
 class EncoderTest extends TestCase
 {
-    public function testCanBeInstantiated() : void
+    public function testCanBeInstantiated(): void
     {
         $encoder = new Encoder(new ConfigAdapter());
         $this->assertInstanceOf(Encoder::class, $encoder);
     }
-    public function testSetContentOnInstantiate() : void
+    public function testSetContentOnInstantiate(): void
     {
-        $encoder = new Encoder(new ConfigAdapter(),[],'content to encode');
+        $encoder = new Encoder(new ConfigAdapter(), [], 'content to encode');
         $this->assertInstanceOf(Encoder::class, $encoder);
     }
-    public function testSetArrayContent() : void
+    public function testSetArrayContent(): void
     {
         $encoder = new Encoder(new ConfigAdapter());
         $encoder->setContent(['content to encode']);
         $this->assertInstanceOf(Encoder::class, $encoder);
     }
-    public function testSetObjectContent() : void
+    public function testSetObjectContent(): void
     {
         $encoder = new Encoder(new ConfigAdapter());
-        $content = new \stdClass();
+        $content = new stdClass();
         $content->xxx = 'content';
         $encoder->setContent($content);
         $this->assertInstanceOf(Encoder::class, $encoder);
     }
-    
+
     /**
      * @covers \SUDHAUS7\Guard7Core\Openssl\Key
      * @covers \SUDHAUS7\Guard7Core\Service\ChecksumService
      */
-    public function testAddPublicKey():void
+    public function testAddPublicKey(): void
     {
         $key = Key::createNewKey()->unlock();
-        
+
         $encoder = new Encoder(new ConfigAdapter());
         $encoder->addPubkey($key->getPublicKey());
         $keys = $encoder->getPubkeys();
         $encoder->setPubkeys($keys);
         $this->assertEquals($keys[0], $key->getPublicKey());
         $checksums = $encoder->getChecksums();
-        $this->assertTrue(\is_array($checksums) && !empty($checksums) && sizeof($checksums)===1);
-        
+        $this->assertTrue(is_array($checksums) && !empty($checksums) && sizeof($checksums)===1);
     }
     /**
      * @covers \SUDHAUS7\Guard7Core\Openssl\Key
      */
-    public function testSetMethod():void
+    public function testSetMethod(): void
     {
         $config = new ConfigAdapter();
-        $encoder = new Encoder($config,[],null,$config->getDefaultMethod());
+        $encoder = new Encoder($config, [], null, $config->getDefaultMethod());
         $this->assertEquals($encoder->getMethod(), $config->getDefaultMethod());
         $encoder->setMethod('aes128');
-        $this->assertEquals($encoder->getMethod(),'aes128');
-        
+        $this->assertEquals($encoder->getMethod(), 'aes128');
     }
-    
+
     /**
      * @covers SUDHAUS7\Guard7Core\Openssl\Key
      * @covers SUDHAUS7\Guard7Core\Openssl\Service
      * @covers SUDHAUS7\Guard7Core\Service\ChecksumService::calculate
      */
-    public function testRunSimpleEncoding():void
+    public function testRunSimpleEncoding(): void
     {
         $key = Key::createNewKey()->unlock();
         $config = new ConfigAdapter();
@@ -82,7 +82,5 @@ class EncoderTest extends TestCase
         $data = $encoder->run();
         $this->assertNotNull($data);
         $this->assertStringStartsWith($config->getDefaultMethod(), $data);
-        
-        
     }
 }
