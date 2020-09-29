@@ -28,7 +28,6 @@ class Service implements CryptExtensionService
             $pubkeys[$idx] = \openssl_get_publickey($key);
         }
     
-        /** @phpstan-ignore-next-line */
         $ret = \openssl_seal($payload, $sealed, $ekeys, $pubkeys, $method, $iv);
 
         if (!($ret > 0)) {
