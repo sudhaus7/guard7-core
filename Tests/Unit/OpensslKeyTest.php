@@ -2,11 +2,11 @@
 
 namespace SUDHAUS7\Guard7Core\Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
 use SUDHAUS7\Guard7Core\Exceptions\KeyNotReadableException;
 use SUDHAUS7\Guard7Core\Exceptions\KeyNotUnlockedYetException;
 use SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException;
 use SUDHAUS7\Guard7Core\Openssl\Key;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Class OpensslKeyTest
@@ -43,19 +43,41 @@ class OpensslKeyTest extends TestCase
         $testkey = Key::createNewKey();
         $this->assertInstanceOf(Key::class, $testkey->unlock());
     }
-
+    
+    public function testResourceCanBeRead(): void
+    {
+        $testkey = Key::createNewKey()->unlock();
+        $this->assertIsResource($testkey->getResource());
+    }
+    
     public function testPublicKeyCanBeRead(): void
     {
         $testkey = Key::createNewKey()->unlock();
         $this->assertStringStartsWith('-----BEGIN PUBLIC KEY-----', $testkey->getPublicKey());
     }
-
+    
     public function testExceptionIsThrownIfKeyIsNotUnlocked(): void
     {
         $testkey = Key::createNewKey('testcase');
         $this->expectException(KeyNotUnlockedYetException::class);
         $key = new Key($testkey->getKey());
         $key->getPublicKey();
+    }
+    
+    public function testExceptionIsThrownIfWrongPasswordOnExport(): void
+    {
+        $testkey = Key::createNewKey('testcase');
+        $this->expectException(WrongKeyPassException::class);
+        $key = new Key($testkey->getKey());
+        $key->export('wrongpass');
+    }
+    
+    public function testExceptionIsThrownIfKeyIsNotUnlockedOnExport(): void
+    {
+        $testkey = Key::createNewKey('testcase');
+        $this->expectException(KeyNotReadableException::class);
+        $key = new Key($testkey->getKey());
+        $key->export();
     }
 
     public function testExceptionIsThrownWhenUnlockingWithWrongPassword(): void
@@ -101,7 +123,7 @@ class OpensslKeyTest extends TestCase
         $this->assertStringStartsWith('-----BEGIN ENCRYPTED PRIVATE KEY-----', $newkey->getKey());
     }
 
-    public function testKeyWithoutPasswordanBeExported(): void
+    public function testKeyWithoutPasswordCanBeExported(): void
     {
         $testkey = Key::createNewKey();
         $newkey = $testkey->export();

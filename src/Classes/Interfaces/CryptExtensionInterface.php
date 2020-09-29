@@ -4,7 +4,7 @@
 namespace SUDHAUS7\Guard7Core\Interfaces;
 
 use SUDHAUS7\Guard7Core\Exceptions\KeyNotReadableException;
-use SUDHAUS7\Guard7Core\Exceptions\UnlockException;
+use SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException;
 
 interface CryptExtensionInterface
 {
@@ -28,7 +28,7 @@ interface CryptExtensionInterface
     /**
      * lock the Private key
      * @param string $password
-     * @throws UnlockException
+     * @throws WrongKeyPassException
      * @throws KeyNotReadableException
      * @return CryptExtensionInterface
      */

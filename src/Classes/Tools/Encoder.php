@@ -45,6 +45,11 @@ class Encoder
     protected $configurationAdapter;
 
     /**
+     * @var ChecksumService
+     */
+    private $checksumService;
+
+    /**
      * Encoder constructor.
      *
      * @param mixed|null $content
@@ -54,7 +59,7 @@ class Encoder
     public function __construct(ConfigurationAdapterInterface $configurationAdapter, array $pubKeys = [], $content=null, string $method = null)
     {
         $this->configurationAdapter = $configurationAdapter;
-
+        $this->checksumService  = new ChecksumService();
         if ($method === null) {
             $method  = $this->configurationAdapter->getDefaultMethod();
         }
@@ -97,7 +102,7 @@ class Encoder
      */
     public function addPubkey(string $key): void
     {
-        $checksum = ChecksumService::calculate($key);
+        $checksum = $this->checksumService->calculate($key);
         $this->pubkeys[$checksum] = $key;
     }
 
@@ -123,7 +128,7 @@ class Encoder
     public function setPubkeys(array $pubkeys): void
     {
         foreach ($pubkeys as $key) {
-            $checksum = ChecksumService::calculate($key);
+            $checksum = $this->checksumService->calculate($key);
             $this->pubkeys[$checksum] = $key;
         }
     }

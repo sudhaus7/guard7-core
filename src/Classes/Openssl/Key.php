@@ -40,11 +40,18 @@ final class Key implements CryptExtensionInterface
         "private_key_type" => OPENSSL_KEYTYPE_RSA,
     ];
 
+
+    /**
+     * @var ChecksumService
+     */
+    private $checksumService;
+
     /**
      * @inheritDoc
      */
     public function __construct(string $privatekey, string $password=null, string $publickey = null)
     {
+        $this->checksumService = new ChecksumService();
         $this->private = $privatekey;
         if ($publickey === null) {
             try {
@@ -109,7 +116,7 @@ final class Key implements CryptExtensionInterface
      */
     public function checksumPrivate(): string
     {
-        return ChecksumService::calculate($this->private);
+        return $this->checksumService->calculate($this->private);
     }
 
 
@@ -118,7 +125,7 @@ final class Key implements CryptExtensionInterface
      */
     public function checksumPublic(): string
     {
-        return ChecksumService::calculate($this->getPublicKey());
+        return $this->checksumService->calculate($this->getPublicKey());
     }
 
     /**
@@ -139,13 +146,19 @@ final class Key implements CryptExtensionInterface
     public function unlock(string $password = null): CryptExtensionInterface
     {
         if ($password !== null) {
-            if (!$this->resource = openssl_pkey_get_private($this->private, $password)) {
+            $resource = openssl_pkey_get_private($this->private, $password);
+            if (!$resource) {
                 throw new WrongKeyPassException("Can not read Private Key (password given)", 1601039943);
             }
-        } else {
-            if (!$this->resource = openssl_pkey_get_private($this->private)) {
+            $this->resource = $resource;
+        }
+
+        if ($password === null) {
+            $resource = openssl_pkey_get_private($this->private);
+            if (!$resource) {
                 throw new KeyNotReadableException("Can not read Private Key", 1601067642);
             }
+            $this->resource = $resource;
         }
 
         if (empty($this->public)) {
@@ -166,17 +179,20 @@ final class Key implements CryptExtensionInterface
 
     /**
      * @inheritDoc
+     *
+     */
+
+    /**
+     * @inheritDoc
+     * @throws KeyNotReadableException
+     * @throws WrongKeyPassException
      */
     public function export(string $password = null): CryptExtensionInterface
     {
-        if (!$this->resource || $password!==null) {
+        if (!$this->resource) {
             $this->unlock($password);
         }
-        if ($this->resource) {
-            openssl_pkey_export($this->resource, $out);
-        } else {
-            throw new KeyNotUnlockedYetException('the key has not been unlocked', 1601211320);
-        }
+        openssl_pkey_export($this->resource, $out);
         return new Key($out);
     }
 
