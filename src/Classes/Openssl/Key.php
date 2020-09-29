@@ -145,6 +145,7 @@ final class Key implements CryptExtensionInterface
      */
     public function unlock(string $password = null): CryptExtensionInterface
     {
+        
         if ($password !== null) {
             $resource = openssl_pkey_get_private($this->private, $password);
             if (!$resource) {
@@ -161,7 +162,7 @@ final class Key implements CryptExtensionInterface
             $this->resource = $resource;
         }
 
-        if (empty($this->public)) {
+        if (empty($this->public) && $this->resource) {
             /** @var array $details */
             $details = openssl_pkey_get_details($this->resource);
             $this->public = $details["key"];
@@ -192,7 +193,10 @@ final class Key implements CryptExtensionInterface
         if (!$this->resource) {
             $this->unlock($password);
         }
+    
+        /** @phpstan-ignore-next-line */
         openssl_pkey_export($this->resource, $out);
+       
         return new Key($out);
     }
 
