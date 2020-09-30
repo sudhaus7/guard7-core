@@ -20,7 +20,8 @@ interface CryptExtensionInterface
 
 
     /**
-     * unlock the private key
+     * lock the private key
+     * @param string $password
      * @return bool
      */
     public function lock(string $password): bool;

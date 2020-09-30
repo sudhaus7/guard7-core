@@ -3,11 +3,11 @@
 namespace SUDHAUS7\Guard7Core\Tests\Unit;
 
 use InvalidArgumentException;
-use SUDHAUS7\Guard7Core\Factory\KeyFactory;
 use PHPUnit\Framework\TestCase;
+use SUDHAUS7\Guard7Core\Factory\KeyFactory;
 use SUDHAUS7\Guard7Core\Interfaces\CryptExtensionInterface;
-use SUDHAUS7\Guard7Core\Openssl\Key;
-use SUDHAUS7\Guard7Core\Tests\Mockups\Dummy;
+use SUDHAUS7\Guard7Core\Tests\Mockups\ConfigAdapter;
+use SUDHAUS7\Guard7Core\Tests\Mockups\InvalidConfigAdapter;
 
 /**
  * Class KeyFactoryTest
@@ -73,25 +73,28 @@ tq7/ZVTmF+TsUFItApDXsg76kZ66oPJufw==
 
     public function testNewKey(): void
     {
-        $key = KeyFactory::newKey(Key::class);
+        $configuration = new ConfigAdapter();
+        $key = KeyFactory::newKey($configuration);
         $this->assertInstanceOf(CryptExtensionInterface::class, $key);
     }
 
     public function testWrongClass(): void
     {
+        $configuration = new InvalidConfigAdapter();
         $this->expectException(InvalidArgumentException::class);
-        KeyFactory::newKey(Dummy::class);
+        KeyFactory::newKey($configuration);
     }
 
     public function testReadFromFileOrData(): void
     {
-        $test = KeyFactory::readFromString(Key::class, $this->key);
+        $configuration = new ConfigAdapter();
+        $test = KeyFactory::readFromString($configuration, $this->key);
         $this->assertInstanceOf(CryptExtensionInterface::class, $test);
     }
     public function testReadFromFileOrDataWrongClass(): void
     {
+        $configuration = new InvalidConfigAdapter();
         $this->expectException(InvalidArgumentException::class);
-
-        $test = KeyFactory::readFromString(Dummy::class, $this->key);
+        KeyFactory::readFromString($configuration, $this->key);
     }
 }
