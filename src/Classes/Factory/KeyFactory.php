@@ -23,7 +23,7 @@ class KeyFactory
             throw new InvalidArgumentException('A class that implements '.CryptExtensionInterface::class.' must be provided', 1601036366);
         }
         /** @var CryptExtensionInterface $keyclass */
-        return $keyclass::createNewKey($password);
+        return $keyclass::createNewKey($password, $configuration->getKeySize(), $configuration->getDefaultMethod());
     }
 
     /**

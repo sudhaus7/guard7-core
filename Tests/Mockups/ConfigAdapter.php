@@ -16,4 +16,11 @@ class ConfigAdapter implements ConfigurationAdapterInterface
     {
         return 'Openssl';
     }
+    
+    public function getKeySize(): int
+    {
+        return 2048;
+    }
+    
+    
 }

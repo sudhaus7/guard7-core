@@ -8,15 +8,24 @@ use SUDHAUS7\Guard7Core\Exceptions\WrongKeyPassException;
 
 interface CryptExtensionInterface
 {
+    /**
+     * CryptExtensionInterface constructor.
+     *
+     * @param string $privatekey
+     * @param string|null $password
+     * @param string|null $publickey
+     */
     public function __construct(string $privatekey, string $password=null, string $publickey = null);
-
+    
     /**
      * This generates a new Keypair
      *
      * @param string|null $password
+     * @param int|null $size
+     * @param string|null $algorithm
      * @return CryptExtensionInterface
      */
-    public static function createNewKey(string $password = null): CryptExtensionInterface;
+    public static function createNewKey(string $password = null, int $size = null, string $algorithm = null): CryptExtensionInterface;
 
 
     /**

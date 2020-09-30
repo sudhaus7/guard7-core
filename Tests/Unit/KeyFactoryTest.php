@@ -77,7 +77,7 @@ tq7/ZVTmF+TsUFItApDXsg76kZ66oPJufw==
         $key = KeyFactory::newKey($configuration);
         $this->assertInstanceOf(CryptExtensionInterface::class, $key);
     }
-
+    
     public function testWrongClass(): void
     {
         $configuration = new InvalidConfigAdapter();
@@ -97,4 +97,5 @@ tq7/ZVTmF+TsUFItApDXsg76kZ66oPJufw==
         $this->expectException(InvalidArgumentException::class);
         KeyFactory::readFromString($configuration, $this->key);
     }
+
 }

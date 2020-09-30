@@ -17,5 +17,8 @@ class InvalidConfigAdapter implements ConfigurationAdapterInterface
     {
         return 'Xoxo';
     }
-    
+    public function getKeySize(): int
+    {
+        return 204;
+    }
 }

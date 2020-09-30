@@ -75,10 +75,18 @@ final class Key implements CryptExtensionInterface
     /**
      * @inheritDoc
      */
-    public static function createNewKey(string $password = null): CryptExtensionInterface
+    public static function createNewKey(string $password = null, int $size = null, string $algorithm = null): CryptExtensionInterface
     {
+        $config = self::$DEFAULTS;
+        if ($size !== null) {
+            $config['private_key_bits'] = $size;
+        }
+        if ($algorithm !== null) {
+            $config['digest_alg'] = $size;
+        }
+       
         /** @var resource $res */
-        $res = openssl_pkey_new(self::$DEFAULTS);
+        $res = openssl_pkey_new($config);
 
         openssl_pkey_export($res, $privatekey);
         /** @var array $details */
